@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickShare Web - Simple File Sharing</title>
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --background: #f9f9f9;
+            --text-color: #333;
+            --light-gray: #f0f0f0;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background: #121212;
+                --text-color: #f0f0f0;
+                --light-gray: #222;
+            }
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--background);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--box-shadow);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav li {
+            margin-left: 1.5rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        nav a:hover {
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .feature {
+            background: var(--light-gray);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: var(--box-shadow);
+        }
+
+        .feature i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .feature h3 {
+            margin: 1rem 0;
+        }
+
+        .ad-unit {
+            margin: 2rem auto;
+            text-align: center;
+            padding: 1rem;
+            background: var(--light-gray);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .file-drop-zone {
+            border: 3px dashed var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 3rem;
+            text-align: center;
+            margin: 2rem 0;
+            background: var(--light-gray);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .file-drop-zone:hover, .file-drop-zone.dragover {
+            background: rgba(66, 133, 244, 0.1);
+            border-color: var(--secondary-color);
+        }
+
+        .file-list {
+            margin: 2rem 0;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: var(--light-gray);
+            border-radius: var(--border-radius);
+            margin-bottom: 0.5rem;
+        }
+
+        .file-icon {
+            margin-right: 1rem;
+            color: var(--primary-color);
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-actions {
+            margin-left: 1rem;
+        }
+
+        .share-link {
+            margin: 2rem 0;
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+        }
+
+        .link-box {
+            display: flex;
+            margin-top: 1rem;
+        }
+
+        .link-box input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+            font-size: 1rem;
+        }
+
+        .link-box button {
+            padding: 0 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .qr-code {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .qr-code img {
+            max-width: 200px;
+            margin: 0 auto;
+        }
+
+        footer {
+            background: var(--light-gray);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+            }
+
+            nav li {
+                margin-left: 1rem;
+            }
+
+            .hero {
+                padding: 2rem 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        /* Icons (using Unicode as fallback) */
+        .icon-upload::before { content: "↑"; }
+        .icon-download::before { content: "↓"; }
+        .icon-link::before { content: "🔗"; }
+        .icon-file::before { content: "📄"; }
+        .icon-image::before { content: "🖼️"; }
+        .icon-video::before { content: "🎬"; }
+        .icon-audio::before { content: "🔊"; }
+        .icon-close::before { content: "×"; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <span class="icon-upload"></span> QuickShare Web
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#send">Send Files</a></li>
+                <li><a href="#receive">Receive Files</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Top Ad Unit -->
+        <div class="ad-unit">
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUB_ID"
+                    crossorigin="anonymous"></script>
+            <!-- QuickShare Top Banner -->
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-YOUR_PUB_ID"
+                 data-ad-slot="1234567/quick_share_top"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+
+        <section id="home" class="hero">
+            <h1>Share Files Instantly, No Signup Required</h1>
+            <p>Drag, drop, and share files with anyone in seconds. Fast, secure, and completely free.</p>
+            <div class="cta-buttons">
+                <a href="#send" class="btn btn-primary">Send Files</a>
+                <a href="#receive" class="btn btn-secondary">Receive Files</a>
+            </div>
+        </section>
+
+        <section id="how-it-works" class="features">
+            <div class="feature">
+                <span class="icon-upload"></span>
+                <h3>Select Files</h3>
+                <p>Choose any files from your device or drag and drop them directly into your browser.</p>
+            </div>
+            <div class="feature">
+                <span class="icon-link"></span>
+                <h3>Generate Link</h3>
+                <p>We'll create a secure link that you can share with anyone you want to send files to.</p>
+            </div>
+            <div class="feature">
+                <span class="icon-download"></span>
+                <h3>Share & Download</h3>
+                <p>The recipient clicks your link to download the files directly to their device.</p>
+            </div>
+        </section>
+
+        <!-- Middle Ad Unit -->
+        <div class="ad-unit">
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUB_ID"
+                    crossorigin="anonymous"></script>
+            <!-- QuickShare Middle Rectangle -->
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-YOUR_PUB_ID"
+                 data-ad-slot="1234567/quick_share_mid"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+
+        <section id="send" class="send-files">
+            <h2>Send Files</h2>
+            <div id="dropZone" class="file-drop-zone">
+                <p>Drag & drop files here or</p>
+                <button id="browseFiles" class="btn btn-primary">Browse Files</button>
+                <input type="file" id="fileInput" multiple style="display: none;">
+            </div>
+
+            <div id="fileList" class="file-list" style="display: none;">
+                <h3>Selected Files:</h3>
+                <!-- Files will be added here dynamically -->
+            </div>
+
+            <div class="options">
+                <h3>Options:</h3>
+                <div>
+                    <label for="expiration">Link expires after:</label>
+                    <select id="expiration">
+                        <option value="1h">1 Hour</option>
+                        <option value="1d" selected>1 Day</option>
+                        <option value="1w">1 Week</option>
+                    </select>
+                </div>
+                <div>
+                    <label>
+                        <input type="checkbox" id="passwordProtect"> Password protect
+                    </label>
+                    <input type="password" id="passwordField" style="display: none; margin-left: 10px;" placeholder="Enter password">
+                </div>
+                <div>
+                    <label>
+                        <input type="checkbox" id="limitDownloads"> Limit downloads
+                    </label>
+                    <input type="number" id="downloadLimit" style="display: none; margin-left: 10px;" placeholder="Max downloads" min="1" value="1">
+                </div>
+            </div>
+
+            <button id="generateLink" class="btn btn-primary" style="margin-top: 1rem; display: none;">Generate Share Link</button>
+
+            <div id="shareLinkContainer" class="share-link" style="display: none;">
+                <h3>Your share link is ready:</h3>
+                <div class="link-box">
+                    <input type="text" id="shareLink" readonly>
+                    <button id="copyLink">Copy</button>
+                </div>
+                <div class="qr-code">
+                    <h4>Scan to share:</h4>
+                    <img id="qrCodeImage" src="" alt="QR Code">
+                </div>
+                <div class="social-share">
+                    <button id="shareEmail" class="btn btn-secondary">Email</button>
+                    <button id="shareWhatsApp" class="btn btn-secondary">WhatsApp</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sidebar Ad Unit (would be positioned with grid/flex in full layout) -->
+        <div class="ad-unit">
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUB_ID"
+                    crossorigin="anonymous"></script>
+            <!-- QuickShare Sidebar -->
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-YOUR_PUB_ID"
+                 data-ad-slot="1234567/quick_share_sidebar"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+
+        <section id="receive" class="receive-files">
+            <h2>Receive Files</h2>
+            <div class="download-code">
+                <p>Your unique download code:</p>
+                <div class="code-display" style="font-size: 2rem; letter-spacing: 0.5rem; font-weight: bold; margin: 1rem 0;">
+                    ABCD-1234
+                </div>
+                <p>Share this code with the sender, or have them scan the QR code below:</p>
+                <div class="qr-code">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=ABCD-1234" alt="QR Code">
+                </div>
+            </div>
+
+            <div id="uploadProgress" style="display: none; margin-top: 2rem;">
+                <h3>Sender is uploading files...</h3>
+                <progress value="0" max="100" style="width: 100%; height: 20px;"></progress>
+                <p id="progressText">0% - 0 MB of 0 MB</p>
+            </div>
+
+            <div id="downloadReady" style="display: none; margin-top: 2rem;">
+                <h3>Files ready to download!</h3>
+                <div id="receivedFiles" class="file-list">
+                    <!-- Received files will appear here -->
+                </div>
+                <button id="downloadAll" class="btn btn-primary">Download All</button>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">DMCA</a>
+            <a href="#">Contact</a>
+        </div>
+        <p>&copy; 2023 QuickShare Web. All rights reserved.</p>
+        
+        <!-- Footer Ad Unit -->
+        <div class="ad-unit">
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUB_ID"
+                    crossorigin="anonymous"></script>
+            <!-- QuickShare Footer -->
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-YOUR_PUB_ID"
+                 data-ad-slot="1234567/quick_share_footer"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </footer>
+
+    <script>
+        // Dynamic color changing based on time
+        function updateColors() {
+            const hour = new Date().getHours();
+            let primary;
+            
+            if (hour < 12) {
+                primary = '#4285f4'; // Morning blue
+            } else if (hour < 18) {
+                primary = '#34a853'; // Afternoon green
+            } else {
+                primary = '#ea4335'; // Evening red
+            }
+            
+            document.documentElement.style.setProperty('--primary-color', primary);
+        }
+        
+        setInterval(updateColors, 3600000); // Update every hour
+        updateColors();
+
+        // File sharing functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const browseFiles = document.getElementById('browseFiles');
+            const fileList = document.getElementById('fileList');
+            const generateLink = document.getElementById('generateLink');
+            const shareLinkContainer = document.getElementById('shareLinkContainer');
+            const passwordProtect = document.getElementById('passwordProtect');
+            const passwordField = document.getElementById('passwordField');
+            const limitDownloads = document.getElementById('limitDownloads');
+            const downloadLimit = document.getElementById('downloadLimit');
+            const uploadProgress = document.getElementById('uploadProgress');
+            const downloadReady = document.getElementById('downloadReady');
+
+            let files = [];
+
+            // Handle drag and drop
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight() {
+                dropZone.classList.add('dragover');
+            }
+
+            function unhighlight() {
+                dropZone.classList.remove('dragover');
+            }
+
+            dropZone.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const newFiles = dt.files;
+                handleFiles(newFiles);
+            }
+
+            // Handle file input
+            browseFiles.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', () => {
+                handleFiles(fileInput.files);
+            });
+
+            // Process selected files
+            function handleFiles(newFiles) {
+                files = Array.from(newFiles);
+                displayFiles();
+            }
+
+            // Display selected files
+            function displayFiles() {
+                if (files.length === 0) return;
+
+                fileList.innerHTML = '<h3>Selected Files:</h3>';
+                files.forEach((file, index) => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    
+                    let iconClass = 'icon-file';
+                    if (file.type.startsWith('image/')) iconClass = 'icon-image';
+                    else if (file.type.startsWith('video/')) iconClass = 'icon-video';
+                    else if (file.type.startsWith('audio/')) iconClass = 'icon-audio';
+                    
+                    fileItem.innerHTML = `
+                        <span class="${iconClass}"></span>
+                        <div class="file-info">
+                            <div>${file.name}</div>
+                            <small>${formatFileSize(file.size)}</small>
+                        </div>
+                        <div class="file-actions">
+                            <button class="remove-file" data-index="${index}"><span class="icon-close"></span></button>
+                        </div>
+                    `;
+                    
+                    fileList.appendChild(fileItem);
+                });
+
+                fileList.style.display = 'block';
+                generateLink.style.display = 'inline-block';
+
+                // Add event listeners to remove buttons
+                document.querySelectorAll('.remove-file').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        files.splice(index, 1);
+                        displayFiles();
+                        if (files.length === 0) {
+                            fileList.style.display = 'none';
+                            generateLink.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
+            // Format file size
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // Toggle password field
+            passwordProtect.addEventListener('change', function() {
+                passwordField.style.display = this.checked ? 'inline-block' : 'none';
+            });
+
+            // Toggle download limit
+            limitDownloads.addEventListener('change', function() {
+                downloadLimit.style.display = this.checked ? 'inline-block' : 'none';
+            });
+
+            // Generate share link
+            generateLink.addEventListener('click', function() {
+                // In a real app, this would upload files to server and get a shareable link
+                // For demo, we'll simulate this with a fake link
+                const shareLink = `https://quickshareweb.com/download/${generateRandomId()}`;
+                document.getElementById('shareLink').value = shareLink;
+                document.getElementById('qrCodeImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareLink)}`;
+                shareLinkContainer.style.display = 'block';
+                
+                // Scroll to share link
+                shareLinkContainer.scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // Copy link to clipboard
+            document.getElementById('copyLink').addEventListener('click', function() {
+                const shareLink = document.getElementById('shareLink');
+                shareLink.select();
+                document.execCommand('copy');
+                this.textContent = 'Copied!';
+                setTimeout(() => {
+                    this.textContent = 'Copy';
+                }, 2000);
+            });
+
+            // Generate random ID for demo purposes
+            function generateRandomId() {
+                return Math.random().toString(36).substring(2, 10) + '-' + Math.random().toString(36).substring(2, 6);
+            }
+
+            // Simulate receiving files (demo only)
+            setTimeout(() => {
+                uploadProgress.style.display = 'block';
+                simulateUpload();
+            }, 5000);
+
+            function simulateUpload() {
+                let progress = 0;
+                const totalSize = 50; // 50 "units" for demo
+                const progressBar = uploadProgress.querySelector('progress');
+                const progressText = document.getElementById('progressText');
+                
+                const interval = setInterval(() => {
+                    progress += Math.random() * 5;
+                    if (progress >= 100) progress = 100;
+                    
+                    progressBar.value = progress;
+                    progressText.textContent = `${Math.round(progress)}% - ${Math.round(progress * totalSize / 100)} MB of ${totalSize} MB`;
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        uploadProgress.style.display = 'none';
+                        showDownloadReady();
+                    }
+                }, 500);
+            }
+
+            function showDownloadReady() {
+                // Add sample received files
+                const receivedFiles = document.getElementById('receivedFiles');
+                receivedFiles.innerHTML = `
+                    <div class="file-item">
+                        <span class="icon-image"></span>
+                        <div class="file-info">
+                            <div>vacation.jpg</div>
+                            <small>2.4 MB</small>
+                        </div>
+                    </div>
+                    <div class="file-item">
+                        <span class="icon-file"></span>
+                        <div class="file-info">
+                            <div>report.pdf</div>
+                            <small>5.1 MB</small>
+                        </div>
+                    </div>
+                `;
+                
+                downloadReady.style.display = 'block';
+                downloadReady.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            // Load AdSense
+            (function() {
+                const script = document.createElement('script');
+                script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUB_ID';
+                script.crossOrigin = 'anonymous';
+                script.async = true;
+                document.head.appendChild(script);
+            })();
+        });
+    </script>
+</body>
+</html>
